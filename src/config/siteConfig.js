@@ -176,6 +176,49 @@ export const siteConfig = {
       highlighted: false,
     },
   ],
+    configurator: {
+    title: "Configurador Interactivo de Solución",
+    subtitle:
+      "Selecciona los módulos que tu negocio necesita hoy y descubre qué arquitectura te recomendamos.",
+    modules: [
+      {
+        id: "mod-web",
+        label: "Landing Page / Web Comercial",
+        tier: 1,
+        days: 3,
+        desc: "Presencia profesional optimizada para convertir visitas",
+      },
+      {
+        id: "mod-catalog",
+        label: "Catálogo Digital con Pedidos",
+        tier: 2,
+        days: 4,
+        desc: "Productos o servicios filtrables con envío a WhatsApp",
+      },
+      {
+        id: "mod-leads",
+        label: "Captación y Pre-calificación",
+        tier: 2,
+        days: 2,
+        desc: "Filtros inteligentes para recibir clientes listos para comprar",
+      },
+      {
+        id: "mod-crm",
+        label: "Panel de Gestión / Mini-CRM",
+        tier: 3,
+        days: 6,
+        desc: "Control interno de prospectos, ventas y seguimiento",
+      },
+      {
+        id: "mod-ai",
+        label: "Agente de Inteligencia Artificial",
+        tier: 3,
+        days: 5,
+        desc: "Asistente entrenado para responder y guiar clientes 24/7",
+      },
+    ],
+  },
+
 };
 
 export function getWhatsAppUrl(customMessage) {

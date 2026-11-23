@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { ArrowRight, Send } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { siteConfig, getWhatsAppUrl } from "../config/siteConfig";
+import SolutionConfigurator from "./SolutionConfigurator";
 
 export default function DemoSection() {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
-  const [leadName, setLeadName] = useState("");
-  const [leadNeed, setLeadNeed] = useState("Plataforma Web Comercial");
 
   const filteredDemos =
     selectedCategory === "Todos"
@@ -13,13 +12,6 @@ export default function DemoSection() {
       : siteConfig.demoCatalog.items.filter(
           (item) => item.category === selectedCategory
         );
-
-  const handleQuickQuote = (e) => {
-    e.preventDefault();
-    const client = leadName.trim() ? leadName.trim() : "un potencial cliente";
-    const msg = `Hola MIPARCERO, soy ${client}. Probé la demo en tu web y me interesa información sobre: ${leadNeed}.`;
-    window.open(getWhatsAppUrl(msg), "_blank", "noopener,noreferrer");
-  };
 
   return (
     <section id="demos" className="border-y border-zinc-800/80 bg-zinc-950/60 py-20">
@@ -85,44 +77,7 @@ export default function DemoSection() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-violet-500/30 bg-gradient-to-r from-violet-950/30 via-zinc-900/80 to-blue-950/30 p-6 sm:p-8">
-          <div className="grid items-center gap-6 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-violet-400">Demo en vivo</span>
-              <h3 className="mt-1 text-xl font-bold text-white">Simulador de Captación Rápida</h3>
-              <p className="mt-2 text-sm text-zinc-400">
-                Así de sencillo tus futuros clientes podrán enviarte una solicitud estructurada sin formularios largos.
-              </p>
-            </div>
-
-            <form onSubmit={handleQuickQuote} className="grid gap-3 sm:grid-cols-3 lg:col-span-7">
-              <input
-                type="text"
-                placeholder="Tu nombre o negocio"
-                value={leadName}
-                onChange={(e) => setLeadName(e.target.value)}
-                className="rounded-xl border border-zinc-700 bg-zinc-950/90 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none"
-              />
-              <select
-                value={leadNeed}
-                onChange={(e) => setLeadNeed(e.target.value)}
-                className="rounded-xl border border-zinc-700 bg-zinc-950/90 px-4 py-3 text-sm text-white focus:border-violet-500 focus:outline-none"
-              >
-                <option value="Plataforma Web Comercial">Plataforma Web Comercial</option>
-                <option value="Catálogo Digital Inteligente">Catálogo Digital Inteligente</option>
-                <option value="Automatización con IA">Automatización con IA</option>
-                <option value="Sistema de Gestión a Medida">Sistema de Gestión</option>
-              </select>
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
-              >
-                <Send className="h-4 w-4" />
-                Enviar a WhatsApp
-              </button>
-            </form>
-          </div>
-        </div>
+        <SolutionConfigurator />
       </div>
     </section>
   );
