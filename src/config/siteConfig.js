@@ -222,8 +222,9 @@ export const siteConfig = {
 };
 
 export function getWhatsAppUrl(customMessage) {
+  const cleanPhone = String(siteConfig.contact.whatsappNumber).replace(/\D/g, "");
   const text = encodeURIComponent(
     customMessage || siteConfig.contact.defaultMessage
   );
-  return `https://wa.me{siteConfig.contact.whatsappNumber}?text=${text}`;
+  return `https://whatsapp.com{cleanPhone}&text=${text}`;
 }

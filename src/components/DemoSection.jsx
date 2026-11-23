@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { siteConfig, getWhatsAppUrl } from "../config/siteConfig";
 import SolutionConfigurator from "./SolutionConfigurator";
 
@@ -63,15 +64,26 @@ export default function DemoSection() {
 
               <div className="mt-6 flex items-center justify-between border-t border-zinc-800/80 pt-4">
                 <span className="text-xs text-zinc-400">{demo.impact}</span>
-                <a
-                  href={getWhatsAppUrl(`Hola MIPARCERO, me gustaría ver cómo funciona la solución demostrativa: "${demo.name}".`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
-                >
-                  Probar flujo
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </a>
+
+                {demo.id === "demo-1" ? (
+                  <Link
+                    to="/demo/catalogo"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
+                  >
+                    Probar demo en vivo
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                ) : (
+                  <a
+                    href={getWhatsAppUrl(`Hola MIPARCERO, me gustaría ver cómo funciona la solución demostrativa: "${demo.name}".`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
+                  >
+                    Probar flujo
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                )}
               </div>
             </div>
           ))}
