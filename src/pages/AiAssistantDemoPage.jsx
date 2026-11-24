@@ -26,11 +26,15 @@ export default function AiAssistantDemoPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/pizza-ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages }),
-      });
+      const [res] = await Promise.all([
+        fetch("/api/pizza-ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: updatedMessages }),
+        }),
+        new Promise((resolve) => setTimeout(resolve, 1800)),
+      ]);
+
       const data = await res.json();
 
       setMessages((prev) => [
@@ -44,7 +48,7 @@ export default function AiAssistantDemoPage() {
         {
           id: Date.now() + 1,
           sender: "bot",
-          text: "En modo local puro sin Wrangler, publica en Cloudflare Pages para probar el endpoint /api/pizza-ai en vivo.",
+          text: "No pude conectar con el motor de IA. Verifica tu servidor local o conexión.",
         },
       ]);
     } finally {
@@ -94,7 +98,7 @@ export default function AiAssistantDemoPage() {
           ))}
           {isLoading && (
             <div className="flex items-center gap-2 text-xs text-violet-400">
-              <Loader2 className="h-4 w-4 animate-spin" /> NapoliBot IA está razonando tu pedido...
+              <Loader2 className="h-4 w-4 animate-spin" /> NapoliBot IA está escribiendo...
             </div>
           )}
         </div>

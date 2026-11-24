@@ -39,35 +39,51 @@ REGLAS:
       parts: [{ text: m.text }],
     }));
 
-    const response = await fetch(
-      `https://googleapis.com{apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents,
-          generationConfig: {
-            temperature: 0.5,
-            responseMimeType: "application/json",
-          },
-        }),
-      }
-    );
+    const slash = String.fromCharCode(47);
+    const geminiUrl =
+      "https:" +
+      slash +
+      slash +
+      "generativelanguage.googleapis.com" +
+      slash +
+      "v1beta" +
+      slash +
+      "models" +
+      slash +
+      "gemini-3.8-flash:generateContent";
+
+    const response = await fetch(geminiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents,
+        generationConfig: {
+          temperature: 0.5,
+          responseMimeType: "application/json",
+        },
+      }),
+    });
 
     const data = await response.json();
 
     if (!response.ok) {
       return new Response(
         JSON.stringify({
-          reply: `Error de API Gemini (${response.status}): ${data?.error?.message || "Verifica tu API Key"}`,
+          reply: "Error Gemini (" + response.status + "): " + (data?.error?.message || "Revisa tu API Key"),
           orderSummary: null,
         }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const candidates = data.candidates || [];
+    const firstCandidate = candidates[0] || {};
+    const parts = firstCandidate.content?.parts || [];
+    const rawText = parts[0]?.text || "{}";
     const parsed = JSON.parse(rawText);
 
     return new Response(JSON.stringify(parsed), {
@@ -76,7 +92,7 @@ REGLAS:
   } catch (error) {
     return new Response(
       JSON.stringify({
-        reply: `Detalle técnico: ${error.message}`,
+        reply: "Detalle técnico: " + error.message,
         orderSummary: null,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
