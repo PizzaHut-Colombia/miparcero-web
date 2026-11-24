@@ -4,6 +4,12 @@ import { Link } from "react-router-dom";
 import { siteConfig, getWhatsAppUrl } from "../config/siteConfig";
 import SolutionConfigurator from "./SolutionConfigurator";
 
+const demoRoutes = {
+  "demo-1": "/demo/catalogo",
+  "demo-2": "/demo/asistente",
+  "demo-3": "/demo/crm",
+};
+
 export default function DemoSection() {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
 
@@ -49,45 +55,48 @@ export default function DemoSection() {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          {filteredDemos.map((demo) => (
-            <div key={demo.id} className="flex flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium text-blue-400">{demo.category}</span>
-                  <span className="rounded-full border border-zinc-700 bg-zinc-800/80 px-2.5 py-0.5 text-[11px] font-medium text-zinc-300">
-                    {demo.tag}
-                  </span>
+          {filteredDemos.map((demo) => {
+            const targetRoute = demoRoutes[demo.id];
+
+            return (
+              <div key={demo.id} className="flex flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium text-blue-400">{demo.category}</span>
+                    <span className="rounded-full border border-zinc-700 bg-zinc-800/80 px-2.5 py-0.5 text-[11px] font-medium text-zinc-300">
+                      {demo.tag}
+                    </span>
+                  </div>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{demo.name}</h3>
+                  <p className="mt-2 text-sm text-zinc-400">{demo.summary}</p>
                 </div>
-                <h3 className="mt-3 text-lg font-semibold text-white">{demo.name}</h3>
-                <p className="mt-2 text-sm text-zinc-400">{demo.summary}</p>
+
+                <div className="mt-6 flex items-center justify-between border-t border-zinc-800/80 pt-4">
+                  <span className="text-xs text-zinc-400">{demo.impact}</span>
+
+                  {targetRoute ? (
+                    <Link
+                      to={targetRoute}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
+                    >
+                      Probar demo en vivo
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  ) : (
+                    <a
+                      href={getWhatsAppUrl(`Hola MIPARCERO, me gustaría ver cómo funciona la solución demostrativa: "${demo.name}".`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
+                    >
+                      Probar flujo
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
               </div>
-
-              <div className="mt-6 flex items-center justify-between border-t border-zinc-800/80 pt-4">
-                <span className="text-xs text-zinc-400">{demo.impact}</span>
-
-               {demo.id === "demo-1" || demo.id === "demo-3" ? (
-  <Link
-    to={demo.id === "demo-1" ? "/demo/catalogo" : "/demo/crm"}
-    className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
-  >
-    Probar demo en vivo
-    <ArrowRight className="h-3.5 w-3.5" />
-  </Link>
-) : (
-  <a
-    href={getWhatsAppUrl(`Hola MIPARCERO, me gustaría ver cómo funciona la solución demostrativa: "${demo.name}".`)}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
-  >
-    Probar flujo
-    <ArrowRight className="h-3.5 w-3.5" />
-  </a>
-)}
-
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <SolutionConfigurator />
