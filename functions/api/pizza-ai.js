@@ -6,7 +6,7 @@ export async function onRequestPost(context) {
     if (!apiKey) {
       return new Response(
         JSON.stringify({
-          reply: "Falta configurar GEMINI_API_KEY en el entorno para activar el motor de IA en vivo.",
+          reply: "Falta configurar GEMINI_API_KEY en Cloudflare Pages.",
           orderSummary: null,
         }),
         { status: 200, headers: { "Content-Type": "application/json" } }
@@ -14,25 +14,27 @@ export async function onRequestPost(context) {
     }
 
     const systemPrompt = `Eres NapoliBot, el asistente virtual de ventas con IA de "Napoli Woodfire Pizza" en Colombia.
-Tu objetivo es atender clientes con amabilidad, precisión y rapidez, ayudarles a elegir pizzas y cerrar pedidos.
+Atiende clientes con amabilidad, precisión y naturalidad.
 CARTA OFICIAL (Precios en COP):
 - Pepperoni Crunch: Mediana $32.000 | Familiar $46.000
 - Hawaiana Caramelizada: Mediana $30.000 | Familiar $44.000
 - Carnes Maduradas & Tocineta: Mediana $36.000 | Familiar $52.000
 - 4 Quesos & Albahaca: Mediana $33.000 | Familiar $47.000
-- Pizzas mitad y mitad: se cobra el promedio o el valor de la especialidad mayor.
+- Mitad y mitad: se cobra el valor de la especialidad mayor.
 - Bebidas: Gaseosa 1.5L ($7.000), Limonada de Coco ($9.500).
 - Promo del día: 2 Pizzas Medianas + Gaseosa 1.5L por $58.000.
-- Domicilio urbano: $4.000 (Gratis por compras superiores a $60.000). Horario: 12:00 m. a 11:00 p.m.
+- Domicilio urbano: $4.000 (Gratis en compras mayores a $60.000). Horario: 12:00 m. a 11:00 p.m.
 
-REGLAS ESTRICTAS:
-1. Responde de forma natural, corta y persuasiva (máximo 4 líneas).
-2. Calcula los precios exactamente según la carta.
-3. Si el cliente ya mencionó qué productos quiere pedir, devuelve JSON puro con esta estructura exacta:
-{"reply": "tu respuesta amable aquí", "orderSummary": "resumen corto del pedido y total en COP"}
-Si aún no ha elegido productos concretos, deja "orderSummary": null.`;
+REGLAS:
+1. Responde natural, claro y persuasivo (máximo 4 líneas).
+2. Calcula precios exactos según la carta.
+3. Responde SIEMPRE en JSON puro con esta estructura:
+{"reply": "tu respuesta aquí", "orderSummary": "resumen corto del pedido y total en COP si el cliente ya pidió algo, o null si aún no pide"}`;
 
-    const contents = messages.map((m) => ({
+    const firstUserIdx = messages.findIndex((m) => m.sender === "user");
+    const validHistory = firstUserIdx >= 0 ? messages.slice(firstUserIdx) : messages;
+
+    const contents = validHistory.map((m) => ({
       role: m.sender === "user" ? "user" : "model",
       parts: [{ text: m.text }],
     }));
@@ -46,7 +48,7 @@ Si aún no ha elegido productos concretos, deja "orderSummary": null.`;
           systemInstruction: { parts: [{ text: systemPrompt }] },
           contents,
           generationConfig: {
-            temperature: 0.4,
+            temperature: 0.5,
             responseMimeType: "application/json",
           },
         }),
@@ -54,7 +56,18 @@ Si aún no ha elegido productos concretos, deja "orderSummary": null.`;
     );
 
     const data = await response.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!response.ok) {
+      return new Response(
+        JSON.stringify({
+          reply: `Error de API Gemini (${response.status}): ${data?.error?.message || "Verifica tu API Key"}`,
+          orderSummary: null,
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     const parsed = JSON.parse(rawText);
 
     return new Response(JSON.stringify(parsed), {
@@ -63,7 +76,7 @@ Si aún no ha elegido productos concretos, deja "orderSummary": null.`;
   } catch (error) {
     return new Response(
       JSON.stringify({
-        reply: "Tuve un breve retraso procesando tu mensaje. ¿Me repites qué sabor o tamaño de pizza deseas?",
+        reply: `Detalle técnico: ${error.message}`,
         orderSummary: null,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
